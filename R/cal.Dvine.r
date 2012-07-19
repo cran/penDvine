@@ -1,9 +1,11 @@
 cal.Dvine <- function(obj,val) {
-  if(!class(obj)=="penDvine") stop("obj has to be of class penDvine")
+  if(!class(obj$Dvine)=="penDvine") stop("obj$Dvine is not from class penDvine")
   Dvine.save <- obj$Dvine
+  doMC <- require(doMC)
   K <- obj$K
   S <- obj$S
   N <-  obj$N
+  base <- obj$base
                       
   Dvine <- list()
   SSi <-  list()
@@ -14,7 +16,7 @@ cal.Dvine <- function(obj,val) {
     }
   Dvine <- append(Dvine, list(SSi))
 
- level <-  1
+  level <-  1
   SS <-  Dvine[[level]]
   nSS <- length(SS)
   while (nSS>1)
@@ -58,26 +60,26 @@ cal.Dvine <- function(obj,val) {
  
 log.like <- AIC <- 0
   
-if(obj$doMC){
+if(doMC){
   Tree.l.temp <- foreach(i=1:length(Tree.l),.combine=list, .multicombine=TRUE) %dopar%   {
     index.j1 <- Tree.l[[i]]$j1
     index.j2 <- Tree.l[[i]]$j2
     U.hat <- val[,c(index.j1,index.j2)]
     #U <- matrix(plot.paircopula(Dvine.save[[level]][[i]]$cop,val=U.hat,int=FALSE,marg=FALSE,contour=FALSE,plot=FALSE)[,3],ncol=1)
-    U <- eval.paircopula(val[,c(index.j1,index.j2)],K=K,int=FALSE,Index.basis.D,ck.val=Dvine.save[[level]][[i]]$v)
+    U <- eval.paircopula(val[,c(index.j1,index.j2)],K=K,int=FALSE,Index.basis.D,ck.val=Dvine.save[[level]][[i]]$v,base)
     ll <- sum(sapply(U,log))
     list(j1=index.j1,j2=index.j2,D=NULL,v=Dvine.save[[level]][[i]]$v,U.hat=U.hat,U=U,cop=Dvine.save[[level]][[i]]$cop,log.like=ll) 
   }
 }
 else {
- Tree.l.temp <- foreach(i=1:length(Tree.l),.combine=list, .multicombine=TRUE) %do%   {
+  Tree.l.temp <- list()
+  for(i in 1:length(Tree.l)) { 
     index.j1 <- Tree.l[[i]]$j1
     index.j2 <- Tree.l[[i]]$j2
     U.hat <- val[,c(index.j1,index.j2)]
-    #U <- matrix(plot.paircopula(Dvine.save[[level]][[i]]$cop,val=U.hat,int=FALSE,marg=FALSE,contour=FALSE,plot=FALSE)[,3],ncol=1)
-    U <- eval.paircopula(val[,c(index.j1,index.j2)],K=K,int=FALSE,Index.basis.D,ck.val=Dvine.save[[level]][[i]]$v)
+    U <- eval.paircopula(val[,c(index.j1,index.j2)],K=K,int=FALSE,Index.basis.D,ck.val=Dvine.save[[level]][[i]]$v,base)
     ll <- sum(sapply(U,log))
-    list(j1=index.j1,j2=index.j2,D=NULL,v=Dvine.save[[level]][[i]]$v,U.hat=U.hat,U=U,cop=Dvine.save[[level]][[i]]$cop,log.like=ll) 
+    Tree.l.temp[[i]] <- list(j1=index.j1,j2=index.j2,D=NULL,v=Dvine.save[[level]][[i]]$v,U.hat=U.hat,U=U,cop=Dvine.save[[level]][[i]]$cop,log.like=ll) 
   }
 }
 
@@ -92,7 +94,7 @@ else {
     level <-  level+1
     Tree.l <- Dvine[[level]] # current tree in vine
     Tree.l1 <- Dvine[[level-1]] # previous tree in vine, one level up
-    if(obj$doMC){
+    if(doMC){
       Tree.l.temp <- foreach(i=1:length(Tree.l),.combine=list, .multicombine=TRUE) %dopar% {
         U.hat <- c()
         index <- list(c(Tree.l[[i]]$j1,Tree.l[[i]]$D),c(Tree.l[[i]]$j2,Tree.l[[i]]$D))
@@ -105,36 +107,39 @@ else {
                 index.ancestor <- c(index.ancestor, all( sort(indexi)==sort(c(Tree.l1[[m]]$j1,Tree.l1[[m]]$j2,Tree.l1[[m]]$D))))
               }
             ancestor.knot <- Tree.l1[index.ancestor][[1]] # Ancestor knot of j-th Element in Index set, i.e. knot with indices {j1,D}  # for j=1 and {j2,D} for j=2, respectively.
-            if(j==1) U.hat <-cbind(U.hat,cond.cop(data=ancestor.knot$U.hat,coef=ancestor.knot$v,K=K,diff="u2",Index.basis.D))
-            if(j==2) U.hat <-cbind(U.hat,cond.cop(data=ancestor.knot$U.hat,coef=ancestor.knot$v,K=K,diff="u1",Index.basis.D))          
+            if(j==1) U.hat <-cbind(U.hat,cond.cop(data=ancestor.knot$U.hat,coef=ancestor.knot$v,K=K,diff="u2",Index.basis.D,base))
+            if(j==2) U.hat <-cbind(U.hat,cond.cop(data=ancestor.knot$U.hat,coef=ancestor.knot$v,K=K,diff="u1",Index.basis.D,base))          
           }
         #U  <- matrix(plot.paircopula(Dvine.save[[level]][[i]]$cop,val=U.hat,int=FALSE,marg=FALSE,contour=FALSE,plot=FALSE)[,3],ncol=1)
-        U <- eval.paircopula(val=U.hat,K=K,int=FALSE,Index.basis.D,ck.val=Dvine.save[[level]][[i]]$v)
+        U <- eval.paircopula(val=U.hat,K=K,int=FALSE,Index.basis.D,ck.val=Dvine.save[[level]][[i]]$v,base)
         ll <- sum(sapply(U,log))
         list(j1=Tree.l[[i]]$j1,j2=Tree.l[[i]]$j2,D=Tree.l[[i]]$D,U.hat=U.hat,U=U,v=Dvine.save[[level]][[i]]$v,cop=Dvine.save[[level]][[i]]$cop,log.like=ll)
       }
     }
   else {
-      Tree.l.temp <- foreach(i=1:length(Tree.l),.combine=list, .multicombine=TRUE) %do% {
-        U.hat <- c()
-        index <- list(c(Tree.l[[i]]$j1,Tree.l[[i]]$D),c(Tree.l[[i]]$j2,Tree.l[[i]]$D))
-        for(j in 1:2)
-          {
-            indexi <- index[[j]]
-            index.ancestor <- c()
-            for (m in 1:length(Tree.l1))
-              {
-                index.ancestor <- c(index.ancestor, all( sort(indexi)==sort(c(Tree.l1[[m]]$j1,Tree.l1[[m]]$j2,Tree.l1[[m]]$D))))
-              }
-            ancestor.knot <- Tree.l1[index.ancestor][[1]] # Ancestor knot of j-th Element in Index set, i.e. knot with indices {j1,D}
+    level <-  level+1
+    Tree.l <- Dvine[[level]] # current tree in vine
+    Tree.l1 <- Dvine[[level-1]] # previous tree in vine, one level up
+    Tree.l.temp <- list()
+    for (i in 1:length(Tree.l)) {
+      U.hat <- c()
+      index <- list(c(Tree.l[[i]]$j1,Tree.l[[i]]$D),c(Tree.l[[i]]$j2,Tree.l[[i]]$D))
+      for(j in 1:2)
+        {
+          indexi <- index[[j]]
+          index.ancestor <- c()
+          for (m in 1:length(Tree.l1))
+            {
+              index.ancestor <- c(index.ancestor, all( sort(indexi)==sort(c(Tree.l1[[m]]$j1,Tree.l1[[m]]$j2,Tree.l1[[m]]$D))))
+            }
+          ancestor.knot <- Tree.l1[index.ancestor][[1]] # Ancestor knot of j-th Element in Index set, i.e. knot with indices {j1,D}
                                         # for j=1 and {j2,D} for j=2, respectively.
-            if(j==1) U.hat <-cbind(U.hat,cond.cop(data=ancestor.knot$U.hat,coef=ancestor.knot$v,K=K,diff="u2",Index.basis.D))
-            if(j==2) U.hat <-cbind(U.hat,cond.cop(data=ancestor.knot$U.hat,coef=ancestor.knot$v,K=K,diff="u1",Index.basis.D))          
+          if(j==1) U.hat <-cbind(U.hat,cond.cop(data=ancestor.knot$U.hat,coef=ancestor.knot$v,K=K,diff="u2",Index.basis.D,base))
+          if(j==2) U.hat <-cbind(U.hat,cond.cop(data=ancestor.knot$U.hat,coef=ancestor.knot$v,K=K,diff="u1",Index.basis.D,base))          
           }
-        #U  <- matrix(plot.paircopula(Dvine.save[[level]][[i]]$cop,val=U.hat,int=FALSE,marg=FALSE,contour=FALSE,plot=FALSE)[,3],ncol=1)
-        U <- eval.paircopula(val=U.hat,K=K,int=FALSE,Index.basis.D,ck.val=Dvine.save[[level]][[i]]$v)
-        ll <- sum(sapply(U,log))
-        list(j1=Tree.l[[i]]$j1,j2=Tree.l[[i]]$j2,D=Tree.l[[i]]$D,U.hat=U.hat,U=U,v=Dvine.save[[level]][[i]]$v,cop=Dvine.save[[level]][[i]]$cop,log.like=ll)
+      U <- eval.paircopula(val=U.hat,K=K,int=FALSE,Index.basis.D,ck.val=Dvine.save[[level]][[i]]$v,base)
+      ll <- sum(sapply(U,log))
+      Tree.l.temp[[i]] <- list(j1=Tree.l[[i]]$j1,j2=Tree.l[[i]]$j2,D=Tree.l[[i]]$D,U.hat=U.hat,U=U,v=Dvine.save[[level]][[i]]$v,cop=Dvine.save[[level]][[i]]$cop,log.like=ll)
       }
     }
     
@@ -162,12 +167,10 @@ else {
           index.ancestor <- c(index.ancestor, all( sort(indexi)==sort(c(Tree.l1[[m]]$j1,Tree.l1[[m]]$j2,Tree.l1[[m]]$D))))
         }
       ancestor.knot <- Tree.l1[index.ancestor][[1]] # Ancestor knot of j-th Element in Index set, i.e. knot with indices {j1,D}
-      if(j==1) U.hat <-cbind(U.hat,cond.cop(data=ancestor.knot$U.hat,coef=ancestor.knot$v,K=K,diff="u2",Index.basis.D))
-      if(j==2) U.hat <-cbind(U.hat,cond.cop(data=ancestor.knot$U.hat,coef=ancestor.knot$v,K=K,diff="u1",Index.basis.D))
+      if(j==1) U.hat <-cbind(U.hat,cond.cop(data=ancestor.knot$U.hat,coef=ancestor.knot$v,K=K,diff="u2",Index.basis.D,base))
+      if(j==2) U.hat <-cbind(U.hat,cond.cop(data=ancestor.knot$U.hat,coef=ancestor.knot$v,K=K,diff="u1",Index.basis.D,base))
     }
-
-  #U  <- matrix(plot.paircopula(Dvine.save[[level]][[i]]$cop,val=U.hat,int=FALSE,marg=FALSE,contour=FALSE,plot=FALSE)[,3],ncol=1)
-  U <- eval.paircopula(val=U.hat,K=K,int=FALSE,Index.basis.D,ck.val=Dvine.save[[level]][[i]]$v)
+  U <- eval.paircopula(val=U.hat,K=K,int=FALSE,Index.basis.D,ck.val=Dvine.save[[level]][[i]]$v,base)
   ll <- sum(sapply(U,log))
   Tree.l.temp <- list(j1=Tree.l[[i]]$j1,j2=Tree.l[[i]]$j2,D=Tree.l[[i]]$D,U=U,v=Dvine.save[[level]][[i]]$v,cop=Dvine.save[[level]][[i]]$cop,log.like=ll)
   Dvine[[level]][[1]] <- Tree.l.temp

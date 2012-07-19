@@ -3,7 +3,7 @@
 \title{Flexible Pair-Copula Estimation in D-vines with Penalized Splines}
 \description{Calculating D-vines with penalized B-splines or penalized
   Bernstein polynomials}
-\usage{Dvine(data,K=8,lambda=100,order.Dvine=TRUE,pen=1,doMC=TRUE,base="Bernstein",m=2)}
+\usage{Dvine(data,K=8,lambda=100,order.Dvine=TRUE,pen=1,base="Bernstein",m=2)}
      
 \arguments{
   \item{data}{'data' contains the data. 'data' has to be a matrix or a
@@ -17,8 +17,6 @@
     difference penalty of m-th order. 'pen=2' is only implemented for
     Bernstein polynomials, it is the penalty based
     on the integrated squared second order derivatives of the Bernstein polynomials.}
-  \item{doMC}{Indicating if parallel computing using the doMC-pacakges
-  is done, default is TRUE. 'doMC' does not work for Windows PC.}
   \item{base}{Type of basis function, default is
     "Bernstein". An alternative is base="B-spline".}
   \item{m}{Indicating the order of differences to be penalised. Default is "m=2".}
@@ -31,7 +29,17 @@
   The specifications in 'Dvine' are done for every paircopula in the
   Dvine. There is no option to change parameters for some paircopulas.  
 }
-\value{Returning an Dvine.}
+\value{Returning a list containing
+  \item{Dvine}{an object of class 'Dvine'}
+  \item{log.like}{the estimated log-likelihood}
+  \item{AIC}{AIC value}
+  \item{cAIC}{corrected AIC value}
+  \item{K}{Number of K}
+  \item{order}{the used order of the first level}
+  \item{S}{Sequence seq(1:(dim(data)[2]))}
+  \item{N}{Number of observations, that is dim(data)[1]}
+  \item{base}{Used basis function}
+  }
 \references{Flexible Pair-Copula Estimation in D-vines with Penalized
   Splines, Kauermann G. and Schellhase C. (2012), to appear.}
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}

@@ -1,9 +1,9 @@
-Dvine <- function(data,K=8,lambda=100,order.Dvine=TRUE,pen=1,doMC=TRUE,base="Bernstein",m=2) {
-
-  if(doMC) {
-    library(doMC)
-    registerDoMC()
-  }
+Dvine <- function(data,K=8,lambda=100,order.Dvine=TRUE,pen=1,base="Bernstein",m=2) {
+  if(require(doMC)) doMC <- TRUE else doMC <- FALSE
+    if(doMC) {
+      library(doMC)
+      registerDoMC()
+    }
 
   if(base=="B-spline") q <- 2 else q <- NULL
   if(!is.matrix(data)) data <- as.matrix(data)
@@ -84,7 +84,8 @@ if(order.Dvine) {
   pairs <- get("pairs",help.env)
 
   if(!doMC) {
-    Tree.l.temp <- foreach(i=1:length(Tree.l),.combine=list,.multicombine=TRUE) %do%   {
+    Tree.l.temp <- list()
+    for(i in 1:length(Tree.l)) {
       he <- ord[c(i,i+1)]
       line <- c()
       for(mm in 1:dim(pairs)[1])  {
@@ -94,7 +95,7 @@ if(order.Dvine) {
       index.j1 <- Tree.l[[i]]$j1
       index.j2 <- Tree.l[[i]]$j2 
       model.l <- get("cal.order",help.env)[[line]]
-      list(j1=index.j1,j2=index.j2,D=NULL,v=get("ck.val",model.l),U=U[,c(index.j1,index.j2)],log.like = get("log.like",model.l),cop=model.l , AIC=get("AIC",model.l),cAIC=get("cAIC",model.l),lambda=get("lambda",model.l))
+      Tree.l.temp[[i]] <- list(j1=index.j1,j2=index.j2,D=NULL,v=get("ck.val",model.l),U=U[,c(index.j1,index.j2)],log.like = get("log.like",model.l),cop=model.l , AIC=get("AIC",model.l),cAIC=get("cAIC",model.l),lambda=get("lambda",model.l))
     }
   }
   if(doMC) {
@@ -115,11 +116,13 @@ if(order.Dvine) {
 
 if(!order.Dvine) {
   if(!doMC) {
-    Tree.l.temp <- foreach(i=1:length(Tree.l),.combine=list,.multicombine=TRUE) %do%   {
+    Tree.l.temp <- list()
+    for(i in 1:length(Tree.l)) {
+      #Tree.l.temp <- foreach(i=1:length(Tree.l),.combine=list,.multicombine=TRUE) %do%   {
       index.j1 <- Tree.l[[i]]$j1
       index.j2 <- Tree.l[[i]]$j2
       model.l <- paircopula(U[,c(index.j1,index.j2)],K=K,lambda=lambda,pen=pen,base=base,m=m)
-      list(j1=index.j1,j2=index.j2,D=NULL,v=get("ck.val",model.l),U=U[,c(index.j1,index.j2)],log.like = get("log.like",model.l),AIC=get("AIC",model.l),cAIC=get("cAIC",model.l),lambda=get("lambda",model.l))
+      Tree.l.temp[[i]] <- list(j1=index.j1,j2=index.j2,D=NULL,v=get("ck.val",model.l),U=U[,c(index.j1,index.j2)],log.like = get("log.like",model.l),AIC=get("AIC",model.l),cAIC=get("cAIC",model.l),lambda=get("lambda",model.l))
     }
   }
    if(doMC) {
@@ -195,11 +198,12 @@ if(doMC) {
   }
 }  
 if(!doMC) {
-    foreach(level=3:length(S)) %do% {
+  for(level in 3:length(S)) {
     Tree.l <- Dvine[[level]] # current tree in vine
     Tree.l1 <- Dvine[[level-1]] # previous tree in vine, one level up
     t.length <- length(Tree.l)
-    Tree.l.temp <- foreach(i=1:t.length,.combine=list,.multicombine=TRUE) %do%  {
+    Tree.l.temp <- list()
+    for(i in 1:t.length) {
       UU <-  c()
       index <- list(c(Tree.l[[i]]$j1,Tree.l[[i]]$D),c(Tree.l[[i]]$j2,Tree.l[[i]]$D)) # list of involved indices in current knot, i.e {j1,D} and {j2,D}
       for(j in 1:2) # Loop over both index sets, i.e. {j1,D} and {j2,D}
@@ -216,7 +220,7 @@ if(!doMC) {
           if(j==2) UU <-cbind(UU,cond.cop(ancestor.knot$U,coef=ancestor.knot$v,K=K,diff="u1",Index.basis.D,base=base,q=q))
         }
       model.l <- paircopula(UU,K=K,lambda=lambda,pen=pen,base=base,m=m)
-      list(j1=Tree.l[[i]]$j1,j2=Tree.l[[i]]$j2,D=Tree.l[[i]]$D,U=UU,v=get("ck.val",model.l),log.like = get("log.like",model.l),AIC=get("AIC",model.l),cAIC=get("cAIC",model.l),lambda=get("lambda",model.l))
+      Tree.l.temp[[i]] <- list(j1=Tree.l[[i]]$j1,j2=Tree.l[[i]]$j2,D=Tree.l[[i]]$D,U=UU,v=get("ck.val",model.l),log.like = get("log.like",model.l),AIC=get("AIC",model.l),cAIC=get("cAIC",model.l),lambda=get("lambda",model.l))
     }
     if(level<length(S)) {
       for(i in 1:length(Tree.l.temp)) {
@@ -226,14 +230,13 @@ if(!doMC) {
       }
     }
     else {
-      log.like <- log.like+Tree.l.temp$log.like
-      AIC <- AIC+Tree.l.temp$AIC
-      cAIC <- cAIC+Tree.l.temp$cAIC
-      Tree.l.temp <- list(Tree.l.temp)
+      log.like <- log.like+Tree.l.temp[[i]]$log.like
+      AIC <- AIC+Tree.l.temp[[i]]$AIC
+      cAIC <- cAIC+Tree.l.temp[[i]]$cAIC
     }
     Dvine[[level]] <- Tree.l.temp
   }
 }
   class(Dvine) <- "penDvine"
-return(list(Dvine=Dvine,log.like=log.like,AIC=AIC,cAIC=cAIC,K=K,order=get("order",help.env),S=S,N=N,doMC=doMC))
+return(list(Dvine=Dvine,log.like=log.like,AIC=AIC,cAIC=cAIC,K=K,order=get("order",help.env),S=S,N=N,base=base))
 }

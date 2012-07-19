@@ -18,7 +18,8 @@ cond.cop <- function(data,coef,K,diff="u2",Index.basis.D,base,q=NULL) {
         if(obj!=diff) tilde.Psi.d[,,j] <-  int.bernstein(penden.env,Y=get(paste("u",j,sep=""),penden.env))
       }
       if(base=="B-spline") {
-        if(obj==diff) tilde.Psi.d[,,j] <-  my.bspline(y=get(paste("u",j,sep=""),penden.env),K=K+1,q=q)$base.den
+        assign("q",2,penden.env)
+        if(obj==diff) tilde.Psi.d[,,j] <-  my.bspline(y=get(paste("u",j,sep=""),penden.env),K=K+1,q=2)$base.den
         if(obj!=diff) tilde.Psi.d[,,j] <-  int.bspline2(penden.env,Y=get(paste("u",j,sep=""),penden.env))
       }
     }

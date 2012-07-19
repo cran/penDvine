@@ -23,10 +23,12 @@ order.Dvine <- function(help.env) {
     
   }
   else {
-    h.help <- foreach(i=1:no.pairs,.combine=list,.multicombine=TRUE) %do% {
-      paircopula(data=get("U",help.env)[,pairs[i,]],K=get("K",help.env),lambda=get("lambda",help.env),pen=get("pen",help.env),base=get("base",help.env),m=get("m",help.env))    }
-    h <- foreach(i=1:no.pairs,.combine=rbind,.multicombine=TRUE) %do% {
-      c(pairs[i,],get(order.stat,h.help[[i]]))
+    h.help <- list()
+    h <- matrix(NA,no.pairs,3)
+    for(i in 1:no.pairs) {
+      h.help[[i]] <- paircopula(data=get("U",help.env)[,pairs[i,]],K=get("K",help.env),lambda=get("lambda",help.env),pen=get("pen",help.env),base=get("base",help.env),m=get("m",help.env))    }
+    for (i in 1:no.pairs) {
+      h[i,] <- c(pairs[i,],get(order.stat,h.help[[i]]))
     }
   }  
   colnames(h) <- c("i","j","log.like")

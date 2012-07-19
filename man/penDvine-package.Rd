@@ -13,8 +13,8 @@ distribution of D-vines. For details see the description of the function Dvine()
 \tabular{ll}{
 Package: \tab penDvine\cr
 Type: \tab Package\cr
-Version: \tab 0.1\cr
-Date: \tab 2012-07-06\cr
+Version: \tab 0.2\cr
+Date: \tab 2012-07-19\cr
 License: GPL (>= 2)
 LazyLoad: \tab yes\cr
 }
@@ -23,9 +23,8 @@ and distributions of Dvines using penalized splines techniques.
 }
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}
 
-\references{Flexible Copula Density Estimation with Penalized
-  Hierarchical B-Splines, Kauermann G., Schellhase C. and Ruppert, D. (2011), to appear.}
-
+\references{Flexible Pair-Copula Estimation in D-vines with Penalized
+  Splines, Kauermann G. and Schellhase C. (2012), to appear.}
 \examples{
   #This examples describes the estimation of a D-vine to winddata,
 #available in this package. After the margins are prepared, we estimate a
@@ -34,7 +33,7 @@ and distributions of Dvines using penalized splines techniques.
 
   data(Winddata)
   print(dim(Winddata))
-  bspl.diff2 <-  Dvine(Winddata,K=8,pen=1,lambda=1000,doMC=TRUE,order.Dvine=FALSE,base="B-spline",m=2)
+  bspl.diff2 <-  Dvine(Winddata,K=8,pen=1,lambda=1000,order.Dvine=FALSE,base="B-spline",m=2)
   }
 
 	   
