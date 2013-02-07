@@ -33,9 +33,8 @@ my.loop(penden.env)
    log-likelihood, the log-likelihood, 'lambda' and the weights 'v'.}
 }
 
-\references{Flexible Pair-Copula Estimation in D-vines with Penalized
-  Splines, Kauermann G. and Schellhase C. (2012), to appear.}
+
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}
 \keyword{math}
 
-
+\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized Splines, Kauermann G. and Schellhase C. (2012), working paper}

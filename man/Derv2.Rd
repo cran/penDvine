@@ -30,7 +30,5 @@ Derv2(penden.env,temp=FALSE,lambda=NULL)
 }
 
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}
-\references{Flexible Pair-Copula Estimation in D-vines with Penalized
-  Splines, Kauermann G. and Schellhase C. (2012), to appear.}
-
+\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized Splines, Kauermann G. and Schellhase C. (2012), working paper}
 \keyword{math}

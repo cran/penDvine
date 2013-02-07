@@ -23,7 +23,7 @@ Calculating the actual fitted values of the response, depending on the actual pa
   \item{f.hat.val}{Fitted values for the current coefficents}.
   f.hat.val is saved in the environment.
 }
-\references{Flexible Pair-Copula Estimation in D-vines with Penalized
-  Splines, Kauermann G. and Schellhase C. (2012), to appear.}
+
+\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized Splines, Kauermann G. and Schellhase C. (2012), working paper}
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}
 \keyword{nonparametric}

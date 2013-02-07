@@ -1,11 +1,12 @@
-Dvine <- function(data,K=8,lambda=100,order.Dvine=TRUE,pen=1,base="Bernstein",m=2) {
-  if(require(doMC)) doMC <- TRUE else doMC <- FALSE
+Dvine <- function(data,K=8,lambda=100,order.Dvine=TRUE,pen=1,base="Bernstein",m=2,cores=NULL,q=2) {
+  if(require(doParallel)) doMC <- TRUE else doMC <- FALSE
     if(doMC) {
-      library(doMC)
-      registerDoMC()
+      library(doParallel)
+      if(is.null(cores)) registerDoParallel() else registerDoParallel(cores=cores)
+      mcoptions <- list(preschedule=FALSE)
     }
 
-  if(base=="B-spline") q <- 2 else q <- NULL
+  #if(base=="Bernstein") q <- NULL
   if(!is.matrix(data)) data <- as.matrix(data)
   U <- data
 S <- seq(1:(dim(U)[2]))
@@ -79,36 +80,38 @@ while (nSS>1)
 
 level <-  2
 Tree.l <- Dvine[[level]]
+
 if(order.Dvine) {
   ord <- get("order",help.env)
   pairs <- get("pairs",help.env)
-
   if(!doMC) {
     Tree.l.temp <- list()
     for(i in 1:length(Tree.l)) {
       he <- ord[c(i,i+1)]
-      line <- c()
-      for(mm in 1:dim(pairs)[1])  {
-        if(all(he%in%pairs[mm,])) line <- mm
-        if(all(he[c(2,1)]%in%pairs[mm,])) line <- mm    
-      }
+      #line <- c()
+      #for(mm in 1:dim(pairs)[1])  {
+      #  if(all(he%in%pairs[mm,])) line <- mm
+      #  if(all(he[c(2,1)]%in%pairs[mm,])) line <- mm    
+      #}
       index.j1 <- Tree.l[[i]]$j1
       index.j2 <- Tree.l[[i]]$j2 
-      model.l <- get("cal.order",help.env)[[line]]
+      #model.l <- get("cal.order",help.env)[[line]]
+      model.l <- paircopula(U[,c(he)],K=K,lambda=lambda,pen=pen,base=base,m=m,q=q)
       Tree.l.temp[[i]] <- list(j1=index.j1,j2=index.j2,D=NULL,v=get("ck.val",model.l),U=U[,c(index.j1,index.j2)],log.like = get("log.like",model.l),cop=model.l , AIC=get("AIC",model.l),cAIC=get("cAIC",model.l),lambda=get("lambda",model.l))
     }
   }
   if(doMC) {
-    Tree.l.temp <- foreach(i=1:length(Tree.l),.combine=list,.multicombine=TRUE) %dopar%   {
+    Tree.l.temp <- foreach(i=1:length(Tree.l),.combine=list,.multicombine=TRUE,.options.multicore=mcoptions) %dopar%   {
       he <- ord[c(i,i+1)]
-      line <- c()
-      for(mm in 1:dim(pairs)[1])  {
-        if(all(he%in%pairs[mm,])) line <- mm
-        if(all(he[c(2,1)]%in%pairs[mm,])) line <- mm    
-      }
+      #line <- c()
+      #for(mm in 1:dim(pairs)[1])  {
+      #  if(all(he%in%pairs[mm,])) line <- mm
+      #  if(all(he[c(2,1)]%in%pairs[mm,])) line <- mm    
+      #}
       index.j1 <- Tree.l[[i]]$j1
       index.j2 <- Tree.l[[i]]$j2 
-      model.l <- get("cal.order",help.env)[[line]]
+      #model.l <- get("cal.order",help.env)[[line]]
+      model.l <- paircopula(U[,c(he)],K=K,lambda=lambda,pen=pen,base=base,m=m,q=q)
       list(j1=index.j1,j2=index.j2,D=NULL,v=get("ck.val",model.l),U=U[,c(index.j1,index.j2)],log.like = get("log.like",model.l),cop=model.l , AIC=get("AIC",model.l),cAIC=get("cAIC",model.l),lambda=get("lambda",model.l))
     }
   }
@@ -116,27 +119,29 @@ if(order.Dvine) {
 
 if(!order.Dvine) {
   if(!doMC) {
-    Tree.l.temp <- list()
-    for(i in 1:length(Tree.l)) {
-      #Tree.l.temp <- foreach(i=1:length(Tree.l),.combine=list,.multicombine=TRUE) %do%   {
+    Tree.l.temp <- foreach(i=1:length(Tree.l),.combine=list,.multicombine=TRUE) %do%   {
       index.j1 <- Tree.l[[i]]$j1
       index.j2 <- Tree.l[[i]]$j2
-      model.l <- paircopula(U[,c(index.j1,index.j2)],K=K,lambda=lambda,pen=pen,base=base,m=m)
-      Tree.l.temp[[i]] <- list(j1=index.j1,j2=index.j2,D=NULL,v=get("ck.val",model.l),U=U[,c(index.j1,index.j2)],log.like = get("log.like",model.l),AIC=get("AIC",model.l),cAIC=get("cAIC",model.l),lambda=get("lambda",model.l))
+      model.l <- paircopula(U[,c(index.j1,index.j2)],K=K,lambda=lambda,pen=pen,base=base,m=m,q=q)
+      list(j1=index.j1,j2=index.j2,D=NULL,v=get("ck.val",model.l),U=U[,c(index.j1,index.j2)],log.like = get("log.like",model.l),AIC=get("AIC",model.l),cAIC=get("cAIC",model.l),lambda=get("lambda",model.l))
     }
   }
-   if(doMC) {
-      Tree.l.temp <- foreach(i=1:length(Tree.l),.combine=list,.multicombine=TRUE) %dopar%   {
+ if(doMC) {
+    Tree.l.temp <- foreach(i=1:length(Tree.l),.combine=list,.multicombine=TRUE,.options.multicore=mcoptions) %dopar%   {
       index.j1 <- Tree.l[[i]]$j1
       index.j2 <- Tree.l[[i]]$j2
   
-      model.l <- paircopula(U[,c(index.j1,index.j2)],K=K,lambda=lambda,pen=pen,base=base,m=m)
+      model.l <- paircopula(U[,c(index.j1,index.j2)],K=K,lambda=lambda,pen=pen,base=base,m=m,q=q)
       list(j1=index.j1,j2=index.j2,D=NULL,v=get("ck.val",model.l),U=U[,c(index.j1,index.j2)],log.like = get("log.like",model.l),AIC=get("AIC",model.l),cAIC=get("cAIC",model.l),lambda=get("lambda",model.l))
     }
   }
 }
-  Index.basis.D <- matrix(NA,(K+1)^2,2)
-  Index.basis.D[,1] <- rep(seq(1,(K+1)),(K+1))
+  if(base=="Bernstein") ddb <- K+1
+  if(base=="B-spline" & q==2) ddb <- K+q-1
+  if(base=="B-spline" & q==1) ddb <- K+q-2
+ 
+  Index.basis.D <- matrix(NA,ddb^2,2)
+  Index.basis.D[,1] <- rep(seq(1,ddb),ddb)
   Index.basis.D[,2] <- sort(Index.basis.D[,1])
 
   if(level<length(S)) {
@@ -154,13 +159,12 @@ if(!order.Dvine) {
   }
 
 Dvine[[level]] <- Tree.l.temp
-
 if(doMC) {
   for(level in 3:length(S)) {
     Tree.l <- Dvine[[level]] # current tree in vine
     Tree.l1 <- Dvine[[level-1]] # previous tree in vine, one level up
     t.length <- length(Tree.l)
-    Tree.l.temp <- foreach(i=1:t.length,.combine=list,.multicombine=TRUE) %dopar%  {
+    Tree.l.temp <- foreach(i=1:t.length,.combine=list,.multicombine=TRUE,.options.multicore=mcoptions) %dopar%  {
       UU <-  c()
       index <- list(c(Tree.l[[i]]$j1,Tree.l[[i]]$D),c(Tree.l[[i]]$j2,Tree.l[[i]]$D)) # list of involved indices in current knot, i.e {j1,D} and {j2,D}
       for(j in 1:2) # Loop over both index sets, i.e. {j1,D} and {j2,D}
@@ -172,12 +176,10 @@ if(doMC) {
               index.ancestor <- c(index.ancestor, all(indexi==sort(c(Tree.l1[[ml]]$j1,Tree.l1[[ml]]$j2,Tree.l1[[ml]]$D))))
             }
           ancestor.knot <- Tree.l1[index.ancestor][[1]] # Ancestor knot of j-th Element in Index set, i.e. knot with indices {j1,D} for j=1 and {j2,D} for j=2, respectively.
- 
           if(j==1) UU <-cbind(UU,cond.cop(ancestor.knot$U,coef=ancestor.knot$v,K=K,diff="u2",Index.basis.D,base=base,q=q))
           if(j==2) UU <-cbind(UU,cond.cop(ancestor.knot$U,coef=ancestor.knot$v,K=K,diff="u1",Index.basis.D,base=base,q=q))
         }
-  
-      model.l <- paircopula(UU,K=K,lambda=lambda,pen=pen,base=base,m=m)
+      model.l <- paircopula(UU,K=K,lambda=lambda,pen=pen,base=base,m=m,q=q)
       list(j1=Tree.l[[i]]$j1,j2=Tree.l[[i]]$j2,D=Tree.l[[i]]$D,U=UU,v=get("ck.val",model.l),log.like = get("log.like",model.l),AIC=get("AIC",model.l),cAIC=get("cAIC",model.l),lambda=get("lambda",model.l))
     }
     
@@ -197,6 +199,7 @@ if(doMC) {
     Dvine[[level]] <- Tree.l.temp
   }
 }  
+
 if(!doMC) {
   for(level in 3:length(S)) {
     Tree.l <- Dvine[[level]] # current tree in vine
@@ -219,7 +222,7 @@ if(!doMC) {
           if(j==1) UU <-cbind(UU,cond.cop(ancestor.knot$U,coef=ancestor.knot$v,K=K,diff="u2",Index.basis.D,base=base,q=q))
           if(j==2) UU <-cbind(UU,cond.cop(ancestor.knot$U,coef=ancestor.knot$v,K=K,diff="u1",Index.basis.D,base=base,q=q))
         }
-      model.l <- paircopula(UU,K=K,lambda=lambda,pen=pen,base=base,m=m)
+      model.l <- paircopula(UU,K=K,lambda=lambda,pen=pen,base=base,m=m,q=q)
       Tree.l.temp[[i]] <- list(j1=Tree.l[[i]]$j1,j2=Tree.l[[i]]$j2,D=Tree.l[[i]]$D,U=UU,v=get("ck.val",model.l),log.like = get("log.like",model.l),AIC=get("AIC",model.l),cAIC=get("cAIC",model.l),lambda=get("lambda",model.l))
     }
     if(level<length(S)) {

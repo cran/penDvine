@@ -26,8 +26,8 @@ start.valgrid <- function(penden.env) {
         tilde.Psi.d.knots.start.g.all[,,j] <-  apply(index.b,1,bernstein,x=get("X.knots.g.all",penden.env)[,j],n=get("dd",penden.env))
       }
       if(get("base",penden.env)=="B-spline") {
-        tilde.Psi.d.knots.start.r[,,j] <-  my.bspline(y=X.knots[,j],K=get("K",penden.env)+1,q=get("q",penden.env))$base.den
-        tilde.Psi.d.knots.start.g.all[,,j] <-  my.bspline(y=get("X.knots.g.all",penden.env)[,j],K=get("K",penden.env)+1,q=get("q",penden.env))$base.den
+        tilde.Psi.d.knots.start.r[,,j] <-  my.bspline(y=X.knots[,j],K=get("K",penden.env)+get("q",penden.env)-1,q=get("q",penden.env))$base.den
+        tilde.Psi.d.knots.start.g.all[,,j] <-  my.bspline(y=get("X.knots.g.all",penden.env)[,j],K=get("K",penden.env)+get("q",penden.env)-1,q=get("q",penden.env))$base.den
       }
     }
 

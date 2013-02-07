@@ -13,7 +13,7 @@ eval.paircopula <- function(val,K,int=FALSE,Index.basis.D,ck.val,base) {
     int.bernstein.help(penden.env)
     for (j in 1:2)
       {
-        if(int) tilde.Psi.d[,,j] <-  int.bernstein(x,Y=val[,j])
+        if(int) tilde.Psi.d[,,j] <-  int.bernstein(penden.env,Y=val[,j])
         else tilde.Psi.d[,,j] <- apply(index.b,1,bernstein,x=val[,j],n=K)
       }
   }

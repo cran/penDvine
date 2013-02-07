@@ -1,7 +1,8 @@
 paircopula <- function(data,K=8,base="Bernstein",max.iter=30,lambda=100,data.frame=parent.frame(),m=2,
-                       fix.lambda=FALSE,pen=1) {
+                       fix.lambda=FALSE,pen=1,q=2) {
   library(lattice)
   library(quadprog)
+  library(Matrix)
 
   penden.env <- new.env()
   assign("m",m,penden.env)
@@ -15,11 +16,13 @@ paircopula <- function(data,K=8,base="Bernstein",max.iter=30,lambda=100,data.fra
   assign("base",base,penden.env)
   dd <- K # Grad der Bernsteinbasis
   assign("dd",dd,penden.env)
-  ddb <- dd+1 #Anzahl Bernsteinpolynome
+  if(base=="Bernstein") ddb <- dd+1 #Anzahl Bernsteinpolynome
+  if(base=="B-spline" & q==2) ddb <- K+q-1
+  if(base=="B-spline" & q==1) ddb <- K+q-2
   assign("p",p <- 2,penden.env)
   assign("fix.lambda",fix.lambda,penden.env)
   assign("pen",pen,penden.env)
-  assign("q",q<-2,penden.env)
+  assign("q",q,penden.env)
   assign("base",base,penden.env)
   assign("lambda",lambda,penden.env)
   DD <- ddb^2
@@ -40,18 +43,17 @@ paircopula <- function(data,K=8,base="Bernstein",max.iter=30,lambda=100,data.fra
         }
     }
   
-  assign("T.marg",T.marg,penden.env)
-  
+  assign("T.marg",T.marg,penden.env) 
   tilde.Psi.d <- array(NA,dim=c(get("n",penden.env),ddb,p))
-
   index.b <- matrix(0:dd)
 
   if(base=="Bernstein") for(j in 1:p) tilde.Psi.d[,,j] <- apply(index.b,1,bernstein,x=get("Y",penden.env)[,j],n=dd)
-  if(base=="B-spline") for(j in 1:p) tilde.Psi.d[,,j] <- my.bspline(y=get("Y",penden.env)[,j],K=K+1,q=q)$base.den
-
-  help <- my.bspline(y=seq(0,1,length=K+1),K=K+1,q=q)
-  assign("C",help$base.den,penden.env)
-  assign("stand.num",help$stand.num,penden.env)
+  if(base=="B-spline") for(j in 1:p) tilde.Psi.d[,,j] <- my.bspline(y=get("Y",penden.env)[,j],K=K+q-1,q=q)$base.den
+  if(base=="B-spline") {
+     help <- my.bspline(y=seq(0,1,length=ddb),K=K+q-1,q=q)
+     assign("C",help$base.den,penden.env)
+     assign("stand.num",help$stand.num,penden.env)
+  }
   
   assign("tilde.Psi.d",tilde.Psi.d,penden.env)
 
@@ -66,7 +68,7 @@ paircopula <- function(data,K=8,base="Bernstein",max.iter=30,lambda=100,data.fra
   
   if(base=="Bernstein") int.bernstein.help(penden.env)
   if(base=="Bernstein") assign("tilde.Psi.knots.d",apply(index.b,1,bernstein,x=get("knots",penden.env),n=dd),penden.env)
-  if(base=="B-spline") assign("tilde.Psi.knots.d", my.bspline(y=get("knots",penden.env),K=K+1,q=q)$base.den,penden.env)
+  if(base=="B-spline") assign("tilde.Psi.knots.d", my.bspline(y=get("knots",penden.env),K=K+q-1,q=q)$base.den,penden.env)
   if(base=="B-spline") int.bspline.help(penden.env)
     
   A <- array(NA, dim=c(get("ddb",penden.env),DD,p))

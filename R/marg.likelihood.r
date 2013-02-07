@@ -1,8 +1,11 @@
 marg.likelihood <- function(penden.env,pen.likelihood,temp=FALSE) {
-  help <- eigen(get("DDD.sum",penden.env),symmetric=TRUE)
-  index <- which(help$values>1e-8)
+  #help <- eigen(get("DDD.sum",penden.env),symmetric=TRUE)
+  help <- get("eigen.pen.mat",penden.env)
+  index <- get("index.eigen.pen.mat",penden.env)
+  diag.help2 <- Matrix(diag(help$values[index]),sparse=FALSE,doDiag=TRUE)
+  Utilde <- Matrix(get("Utilde.eigen.pen.mat",penden.env))
   evalues <- help$values[index]
-  Utilde <- help$vectors[,index]
+  t.Utilde <- t(Utilde)
   k1 <- 0.5*sum(log(get("lambda",penden.env)*evalues))
   k2 <- pen.likelihood
   if(!temp) eneu <- eigen(t(Utilde)%*%-get("Derv2.pen",penden.env)%*%Utilde)$values

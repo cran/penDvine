@@ -2,7 +2,6 @@ my.bspline <- function(y,K,q) {
   library(fda)
   knots <- seq(0,1,length=K) 
   len.k <- length(knots)
-  h <- 1/K
   base.den <- bsplineS(y,breaks=knots,norder=q)
   len.b <- dim(base.den)[2]
 

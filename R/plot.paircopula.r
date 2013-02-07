@@ -30,7 +30,7 @@ plot.paircopula <- function(x,val=NULL,marg=TRUE,plot=TRUE,int=FALSE,main.txt=NU
               else tilde.Psi.d[,,j] <-  apply(index.b,1,bernstein,x=grid[,j],n=get("dd",x))
             }
             if(base=="B-spline") {
-              tilde.Psi.d[,,j] <-  my.bspline(y=grid[,j],K=get("K",x)+1,q=get("q",x))$base.den
+              tilde.Psi.d[,,j] <-  my.bspline(y=grid[,j],K=get("K",x)+get("q",x)-1,q=get("q",x))$base.den
             }  
           }
         tilde.PSI.d.D <- tilde.Psi.d[,Index.basis.D[,1],1]

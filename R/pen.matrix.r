@@ -33,8 +33,8 @@ if(get("pen",penden.env)==2) {
 
 if(get("pen",penden.env)==1) {
   m <- get("m",penden.env)
-  K <- (get("K",penden.env))
-  K <- K+1
+  K <- get("K",penden.env)+get("q",penden.env)-1
+  if(get("base",penden.env)=="B-spline"&get("q",penden.env)==1) K <- K-1
   if(m==1) {
     L <- diag(1,K)
     L.1 <- diag(-1,K,K-1)

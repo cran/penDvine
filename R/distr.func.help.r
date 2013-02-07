@@ -1,12 +1,11 @@
 distr.func.help <- function(base,knots,penden.env,q,y) {
   x.help <- c()
-  #browser()
+  n <- length(y)
   for(j in 1:(length(knots)-1)) {
     x.help <- c(x.help,(knots[j+1]-knots[j])/2+knots[j])
   }
   knots.help <- sort(c(x.help,knots))
-  base.help <- my.bspline(y=knots.help, K = get("K",penden.env),q=q)$base.den
-  #base.help <- get("tilde.Psi.knots.d.help",penden.env)
+  base.help <- my.bspline(y=knots.help, K = (get("K",penden.env)+get("q",penden.env)-1),q=q)$base.den
   len.b <- dim(base.help)[2]
   if(is.vector(base.help)) {
     base.help <- matrix(base.help,length(base.help),1)
@@ -26,7 +25,9 @@ distr.func.help <- function(base,knots,penden.env,q,y) {
   #for(i in 1:(len.k-(q-1))) {
   for(i in 1:(len.k-1)) {
     a <- which(knots.help==knots.l[i])
-    b <- which(knots.help==knots.l[i+1])
+    if(q==2) b <- which(knots.help==knots.l[i+1])
+    if(q==1) b <- a+1
+    if(q==1) help.seq <- knots.help[c(a,b)]
     if(q==2) help.seq <- knots.help[c(a,(a+b)/2,b)]
     if(q==3) help.seq <- knots.help[c(a,a+(b-a)/3,a+2*(b-a)/3,b)]
     assign(paste("y.help",i,sep=""),help.seq,envir=help.env)
@@ -86,13 +87,13 @@ for(j in 1:len.b) {
     }
   }
   
-  y.val <- rep(0,get("n",penden.env))
+  y.val <- rep(0,n)
   int.base <- matrix(0,length(y),dim(base.help)[2])
   
   for(j in 1:len.b) {
     INT <- 0
     for(i in 1:(len.k-1)) {
-      y.val <- rep(0,get("n",penden.env))
+      y.val <- rep(0,n)
       funcy <- get(paste("distr.func",i,".",j,sep=""),envir=func.env)
       eval(parse(text=funcy))
       if(i<(len.k-1)) list <- which(knots.l[i] <=y & knots.l[i+1] > y)
@@ -104,3 +105,4 @@ for(j in 1:len.b) {
   }
   return(int.base)
 }
+

@@ -12,24 +12,29 @@ order.Dvine <- function(help.env) {
       count <- count+1
     }
   }
-  
+ 
   if(get("doMC",help.env)) {
-    h.help <- foreach(i=1:no.pairs,.combine=list,.multicombine=TRUE) %dopar% {
-      paircopula(data=get("U",help.env)[,pairs[i,]],K=get("K",help.env),lambda=get("lambda",help.env),pen=get("pen",help.env),base=get("base",help.env),m=get("m",help.env))
+    #mcoptions <- list(preschedule=FALSE)
+    #h.help <- foreach(i=1:no.pairs,.combine=c,.multicombine=TRUE,.options.multicore=mcoptions) %dopar% {
+    #h.help <- foreach(i=1:no.pairs,.combine=c,.multicombine=TRUE) %dopar% {
+    h <- foreach(i=1:no.pairs,.combine=c,.multicombine=TRUE) %dopar% {
+      get(order.stat,paircopula(data=get("U",help.env)[,pairs[i,]],K=get("K",help.env),lambda=get("lambda",help.env),pen=get("pen",help.env),base=get("base",help.env),m=get("m",help.env)))
     }
-    h <- foreach(i=1:no.pairs,.combine=rbind,.multicombine=TRUE) %dopar% {
-      c(pairs[i,],get(order.stat,h.help[[i]]))
-    }
+    #h <- foreach(i=1:no.pairs,.combine=rbind,.multicombine=TRUE) %dopar% {
+    #  c(pairs[i,],get(order.stat,h.help[[i]]))
+    #}
+    h <- cbind(pairs,h)
     
   }
   else {
-    h.help <- list()
+    h.help <- c()
     h <- matrix(NA,no.pairs,3)
     for(i in 1:no.pairs) {
-      h.help[[i]] <- paircopula(data=get("U",help.env)[,pairs[i,]],K=get("K",help.env),lambda=get("lambda",help.env),pen=get("pen",help.env),base=get("base",help.env),m=get("m",help.env))    }
-    for (i in 1:no.pairs) {
-      h[i,] <- c(pairs[i,],get(order.stat,h.help[[i]]))
-    }
+      h[i] <- get(order.stat,paircopula(data=get("U",help.env)[,pairs[i,]],K=get("K",help.env),lambda=get("lambda",help.env),pen=get("pen",help.env),base=get("base",help.env),m=get("m",help.env)))    }
+    #for (i in 1:no.pairs) {
+    #  h[i,] <- c(pairs[i,],get(order.stat,h.help[i]))
+    #}
+    h <- cbind(pairs,h)
   }  
   colnames(h) <- c("i","j","log.like")
   mat <- matrix(NA,len,len)
@@ -43,6 +48,6 @@ order.Dvine <- function(help.env) {
   obj <- as.integer(ceiling(which.min(mat)/len))
   tour <- solve_TSP(as.TSP(mat),method="nn",control=list(start=obj))
   assign("order",as.integer(tour),help.env)
-  assign("cal.order",h.help,help.env)
+  #assign("cal.order",h.help,help.env)
   assign("pairs",pairs,help.env)  
 }

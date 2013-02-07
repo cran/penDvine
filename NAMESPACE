@@ -1,2 +1,2 @@
-import(lattice, quadprog, TSP, fda)
+import(lattice, quadprog, TSP, fda,Matrix)
 export(Dvine,paircopula,plot.paircopula,cal.Dvine,sim.Dvine)

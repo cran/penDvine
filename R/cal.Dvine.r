@@ -1,7 +1,7 @@
 cal.Dvine <- function(obj,val) {
   if(!class(obj$Dvine)=="penDvine") stop("obj$Dvine is not from class penDvine")
   Dvine.save <- obj$Dvine
-  doMC <- require(doMC)
+  doMC <- require(doParallel)
   K <- obj$K
   S <- obj$S
   N <-  obj$N

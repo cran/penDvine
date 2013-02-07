@@ -13,6 +13,5 @@
 \note{bernstein and bernstein2 are identical, only the first argument of
 the functions differs for different applications of 'apply'.}
 \value{Returning a matrix, containing Bernstein Polynomials.}
-\references{Flexible Pair-Copula Estimation in D-vines with Penalized
-  Splines, Kauermann G. and Schellhase C. (2012), to appear.}
+\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized Splines, Kauermann G. and Schellhase C. (2012), working paper}
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}

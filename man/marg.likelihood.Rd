@@ -22,10 +22,7 @@ marg.likelihood(penden.env,pen.likelihood,temp=FALSE)
 \value{
   \item{marg.log.like}{Marginal log-likelihood, saved in the environment}
 }
-
-\references{Flexible Pair-Copula Estimation in D-vines with Penalized
-  Splines, Kauermann G. and Schellhase C. (2012), to appear.}
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}
-
+\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized Splines, Kauermann G. and Schellhase C. (2012), working paper}
 \keyword{nonparametric}
 

@@ -3,7 +3,7 @@
 \title{Flexible Pair-Copula Estimation in D-vines with Penalized Splines}
 \description{Calculating D-vines with penalized B-splines or penalized
   Bernstein polynomials}
-\usage{Dvine(data,K=8,lambda=100,order.Dvine=TRUE,pen=1,base="Bernstein",m=2)}
+\usage{Dvine(data,K=8,lambda=100,order.Dvine=TRUE,pen=1,base="Bernstein",m=2,cores=NULL,q=2)}
      
 \arguments{
   \item{data}{'data' contains the data. 'data' has to be a matrix or a
@@ -20,6 +20,8 @@
   \item{base}{Type of basis function, default is
     "Bernstein". An alternative is base="B-spline".}
   \item{m}{Indicating the order of differences to be penalised. Default is "m=2".}
+  \item{cores}{Default=NULL, the number of cpu cores used for parallel computing can be specified.}
+  \item{q}{Order of B-splines. Default is q=2, NULL if Bernstein polynomials are used.}
  
 }
 \details{The calculation of the Dvine is done stepwise. If the option
@@ -40,6 +42,6 @@
   \item{N}{Number of observations, that is dim(data)[1]}
   \item{base}{Used basis function}
   }
-\references{Flexible Pair-Copula Estimation in D-vines with Penalized
-  Splines, Kauermann G. and Schellhase C. (2012), to appear.}
+
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}
+\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized Splines, Kauermann G. and Schellhase C. (2012), working paper}

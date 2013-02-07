@@ -25,9 +25,7 @@ pen.matrix(penden.env)
   \item{DDD.sum}{Penalty matrix P}
   Matrix is saved in the environment.
 }
-\references{Flexible Pair-Copula Estimation in D-vines with Penalized
-  Splines, Kauermann G. and Schellhase C. (2012), to appear.}
+\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized Splines, Kauermann G. and Schellhase C. (2012), working paper}
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}
-
 \keyword{nonparametric}
 

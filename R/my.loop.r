@@ -7,6 +7,7 @@ my.loop <- function(penden.env) {
   max.iter <- get("max.iter",penden.env)
   assign("calc",TRUE,penden.env)
   fix.lambda <- get("fix.lambda",penden.env)
+  assign("lambda.out",FALSE,penden.env)
 
   while(get("calc",penden.env)) {
     if(get("wrong.lambda",penden.env)){
@@ -32,7 +33,7 @@ my.loop <- function(penden.env) {
     assign("pen.log.like",get("pen.log.like.temp",penden.env),penden.env)
     if(!fix.lambda) {
       help.lambda <- new.lambda(penden.env)
-      if((abs(help.lambda-get("lambda",penden.env))<eps*get("lambda",penden.env))|(i-1)>max.iter) {
+      if((abs(help.lambda-get("lambda",penden.env))<eps*get("lambda",penden.env))|(i-1)>max.iter|get("lambda.out",penden.env)) {
       #if(all(abs((get("ck.val.temp",penden.env)/old.ck)-1)<0.005) | i-1>max.iter) {
         assign("calc",FALSE,penden.env)
         assign("lambda",help.lambda,penden.env)
