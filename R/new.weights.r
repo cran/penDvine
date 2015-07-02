@@ -25,7 +25,6 @@ new.weights <- function(penden.env,lambda.temp=NULL) {
     bvec <- c(0,rep(1/(get("K",penden.env)+1),2*length(vec))-t(get("AA.help",penden.env))%*%get("ck.val",penden.env),-get("ck.val",penden.env)+rep(eps,length(get("ck.val",penden.env))))
     assign("Amat",cbind(matrix(1,DD,1),get("AA.help",penden.env),diag(1,DD)),penden.env)
   }
-
   Derv1(penden.env,temp=TRUE,lambda=lambda.temp)
   Derv2(penden.env,temp=TRUE,lambda=lambda.temp)
   aa <- try(obj <- solve.QP(Dmat=-get("Derv2.pen.temp",penden.env),dvec=get("Derv1.pen.temp",penden.env),Amat=get("Amat",penden.env),bvec=bvec,meq=meq,factorized=FALSE))
@@ -33,9 +32,38 @@ new.weights <- function(penden.env,lambda.temp=NULL) {
     assign("wrong.lambda",TRUE,penden.env)
     return("fehler")
   }
-  else assign("wrong.lambda",FALSE,penden.env)
-  if(any(is.na(obj$solution))) return("fehler")
-
+  if(any(is.na(obj$solution))&get("i",penden.env)==1) {
+     h <- 1
+     calc <- TRUE
+     lambda.seq <- seq(1,51,length=11)
+      while(calc) {
+     	lambda.temp <- lambda.seq[h]
+        Derv1(penden.env,temp=TRUE,lambda=lambda.temp)
+        Derv2(penden.env,temp=TRUE,lambda=lambda.temp)
+        aa <- try(obj <- solve.QP(Dmat=-get("Derv2.pen.temp",penden.env),dvec=get("Derv1.pen.temp",penden.env),Amat=get("Amat",penden.env),bvec=bvec,meq=meq,factorized=FALSE))
+        if(class(aa)=="try-error"|any(is.na(obj$solution))) h <- h+1
+        else {
+          assign("lambda",lambda.seq[h],penden.env)
+          calc <- FALSE
+          assign("lambda.change",TRUE,penden.env)
+          assign("wrong.lambda",FALSE,penden.env)
+        }
+     if(h>9) {
+        assign("wrong.lambda",TRUE,penden.env)
+        return("fehler")
+     }
+     }
+  }
+  else {
+     assign("lambda.change",FALSE,penden.env)
+     assign("wrong.lambda",FALSE,penden.env)
+  }
+  if(get("i",penden.env)>1& any(is.na(obj$solution))) {
+     #browser()
+     print("is.na in obj$solution")
+     assign("wrong.lambda",TRUE,penden.env)
+     return("fehler")
+  }
   assign("delta",obj$solution,penden.env)
   assign("ck.val.temp",get("ck.val",penden.env)+obj$solution,penden.env)
   Derv1(penden.env,temp=TRUE,lambda=lambda.temp)

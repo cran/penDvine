@@ -79,7 +79,8 @@ for(j in 1:len.b) {
   sum <- val <- 0
 
   knots <- knots.l
-
+  obj<-NULL
+  rm(obj)
   for(j in 1:len.b) {
     for(i in 1:(len.k-1)) {
       term <- paste("(",poly.part(i,j,knots,help.env,q,poly=TRUE),")",sep="")

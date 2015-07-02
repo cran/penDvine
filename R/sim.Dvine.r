@@ -5,6 +5,7 @@ sim.Dvine <-function(DV,N=NULL) {
   S <- 1:length(DV$S)
   if(is.null(N)) N <- DV$N
   x <- matrix(runif(N*length(S)),ncol=length(S))
+  base <- get("base",DV)
   K <- DV$K
   
   for ( i in 1:length(S))
@@ -63,10 +64,10 @@ sim.Dvine <-function(DV,N=NULL) {
     l.seq <- seq(j,1)
     
     for(l in 2:j) {
-      Dv[[j.seq[1]]][[l.seq[1]]]$u <- apply(index.b,1,help.func,j=j,l=l,Dv=Dv,x.seq=x.seq,l.seq=l.seq,j.seq=j.seq,K=K,N=N,Index.basis.D)
+      Dv[[j.seq[1]]][[l.seq[1]]]$u <- apply(index.b,1,help.func,j=j,l=l,Dv=Dv,x.seq=x.seq,l.seq=l.seq,j.seq=j.seq,K=K,N=N,Index.basis.D,base=base,q=2)
     }
     for(l in 2:j) {
-      Dv[[j.seq[l]]][[l.seq[l]]]$u <- as.vector(cond.cop(cbind(Dv[[j.seq[l-1]]][[l.seq[l]]]$u,Dv[[j.seq[l-1]]][[l.seq[l-1]]]$u),Dv[[j.seq[l]]][[l.seq[l]]]$v,K=K,diff="u2",Index.basis.D))
+      Dv[[j.seq[l]]][[l.seq[l]]]$u <- as.vector(cond.cop(cbind(Dv[[j.seq[l-1]]][[l.seq[l]]]$u,Dv[[j.seq[l-1]]][[l.seq[l-1]]]$u),Dv[[j.seq[l]]][[l.seq[l]]]$v,K=K,diff="u2",Index.basis.D,base=base,q=2))
     }
   }
   

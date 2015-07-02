@@ -24,6 +24,7 @@ Calculating the actual fitted values of the response, depending on the actual pa
   f.hat.val is saved in the environment.
 }
 
-\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized Splines, Kauermann G. and Schellhase C. (2012), working paper}
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}
 \keyword{nonparametric}
+\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized
+  Splines, Kauermann G. and Schellhase C. (2014+), Statistics and Computing (to appear).}

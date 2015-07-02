@@ -1,6 +1,10 @@
-my.bspline <- function(y,K,q) {
-  library(fda)
+my.bspline <- function(y,K,q,margin.normal=FALSE) {
   knots <- seq(0,1,length=K) 
+  if(margin.normal) {
+    knots <- qnorm(knots)
+    knots[1]<-qnorm(0.0000001)
+    knots[length(knots)]<-qnorm(1-0.0000001)
+  }
   len.k <- length(knots)
   base.den <- bsplineS(y,breaks=knots,norder=q)
   len.b <- dim(base.den)[2]

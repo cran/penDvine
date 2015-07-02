@@ -1,2 +1,7 @@
-import(lattice, quadprog, TSP, fda,Matrix)
+import(lattice, TSP, latticeExtra,fda,Matrix)
 export(Dvine,paircopula,plot.paircopula,cal.Dvine,sim.Dvine)
+importFrom(quadprog,solve.QP)
+importFrom(doParallel,"registerDoParallel")
+importFrom(foreach,"foreach","%do%","%dopar%","%:%")
+importFrom(stats,spline,qnorm,integrate,pnorm,dnorm,runif,as.formula)
+S3method(plot, paircopula)

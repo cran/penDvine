@@ -10,6 +10,7 @@ my.loop <- function(penden.env) {
   assign("lambda.out",FALSE,penden.env)
 
   while(get("calc",penden.env)) {
+    #browser()
     if(get("wrong.lambda",penden.env)){
       assign("calc",FALSE,penden.env)
       f.hat.val(penden.env,cal=TRUE)
@@ -58,12 +59,12 @@ my.loop <- function(penden.env) {
         Derv2(penden.env,temp=TRUE,lambda=help.lambda)
         marg.likelihood(penden.env,get("pen.log.like",penden.env),temp=TRUE)
         my.IC(penden.env,temp=TRUE)
+        assign("lambda",help.lambda,penden.env)
+        new.weights(penden.env,lambda.temp=help.lambda)
         n.liste <- c(get("pen.log.like.temp",penden.env),get("log.like.temp",penden.env),get("marg.log.like.temp",penden.env),help.lambda,get("cAIC.temp",penden.env),get("ck.val",penden.env))
         list <- rbind(get("liste",penden.env),n.liste)
         rownames(list) <- seq(0,(i-1))
         assign("liste",list,penden.env)
-        assign("lambda",help.lambda,penden.env)
-        new.weights(penden.env,lambda.temp=help.lambda)
       }
     }
     if(fix.lambda) {

@@ -12,9 +12,9 @@
     direction the expression is differentiated.}
   \item{Index.basis.D}{Vector of indices built in the program before.}
   \item{base}{"B-spline" or "Bernstein".}
-  \item{q}{Order of the B-spline, default=2}
+  \item{q}{Order of the B-spline, default q=2}
  
 }
-
-\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized Splines, Kauermann G. and Schellhase C. (2012), working paper}
+\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized
+  Splines, Kauermann G. and Schellhase C. (2014+), Statistics and Computing (to appear).}
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}

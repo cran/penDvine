@@ -37,4 +37,5 @@ my.loop(penden.env)
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}
 \keyword{math}
 
-\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized Splines, Kauermann G. and Schellhase C. (2012), working paper}
+\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized
+  Splines, Kauermann G. and Schellhase C. (2014+), Statistics and Computing (to appear).}

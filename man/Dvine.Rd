@@ -22,7 +22,6 @@
   \item{m}{Indicating the order of differences to be penalised. Default is "m=2".}
   \item{cores}{Default=NULL, the number of cpu cores used for parallel computing can be specified.}
   \item{q}{Order of B-splines. Default is q=2, NULL if Bernstein polynomials are used.}
- 
 }
 \details{The calculation of the Dvine is done stepwise. If the option
   'order.Dvine' is selected, the order of the first level of the Dvine
@@ -44,4 +43,6 @@
   }
 
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}
-\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized Splines, Kauermann G. and Schellhase C. (2012), working paper}
+
+\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized
+  Splines, Kauermann G. and Schellhase C. (2014+), Statistics and Computing (to appear).}

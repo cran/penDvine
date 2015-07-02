@@ -1,9 +1,5 @@
 paircopula <- function(data,K=8,base="Bernstein",max.iter=30,lambda=100,data.frame=parent.frame(),m=2,
                        fix.lambda=FALSE,pen=1,q=2) {
-  library(lattice)
-  library(quadprog)
-  library(Matrix)
-
   penden.env <- new.env()
   assign("m",m,penden.env)
   assign("d",K,penden.env)
@@ -113,10 +109,8 @@ paircopula <- function(data,K=8,base="Bernstein",max.iter=30,lambda=100,data.fra
   liste[i,4] <- get("lambda",penden.env)
   liste[i,5] <- get("cAIC",penden.env)
   liste[i,(6:(6+DD-1))] <- get("ck.val",penden.env)
-  #assign(paste("ck.val",i,sep=""),get("ck.val",penden.env),penden.env)
 
   assign("liste",liste,penden.env)
-
   f.hat.val(penden.env,temp=TRUE)
   if(new.weights(penden.env,lambda.temp=lambda)=="fehler"){
     assign("pen.log.like",0,penden.env)
@@ -125,6 +119,19 @@ paircopula <- function(data,K=8,base="Bernstein",max.iter=30,lambda=100,data.fra
     assign("BIC",0,penden.env)
     class(penden.env) <- "paircopula"
     return(penden.env)
+  }
+  if(get("lambda.change",penden.env)) {
+    pen.log.like(penden.env,cal=TRUE)
+    Derv1(penden.env)
+    Derv2(penden.env)
+    marg.likelihood(penden.env,pen.likelihood=get("pen.log.like",penden.env))
+    my.IC(penden.env)
+    liste[i,1] <- get("pen.log.like",penden.env)
+    liste[i,2] <- get("log.like",penden.env)
+    liste[i,3] <- get("marg.log.like",penden.env)
+    liste[i,4] <- get("lambda",penden.env)
+    liste[i,5] <- get("cAIC",penden.env)
+    assign("liste",liste,penden.env)
   }
 
   my.loop(penden.env)

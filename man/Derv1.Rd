@@ -33,6 +33,7 @@ The calculation of the first derivative of the paircopula likelihood function w.
     function w.r.t. parameter v.}
   Derv1.pen is saved in the environment.
 }
-\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized Splines, Kauermann G. and Schellhase C. (2012), working paper}
+\references{Flexible Pair-Copula Estimation in D-vines using Bivariate Penalized
+  Splines, Kauermann G. and Schellhase C. (2014+), Statistics and Computing (to appear).}
 \author{Christian Schellhase <cschellhase@wiwi.uni-bielefeld.de>}
 \keyword{math}

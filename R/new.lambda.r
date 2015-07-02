@@ -11,9 +11,10 @@ new.lambda <- function(penden.env) {
   pen.mat <- get("DDD.sum",penden.env)
   help2 <- get("eigen.pen.mat",penden.env)
   index <- get("index.eigen.pen.mat",penden.env)
-  Utilde <- Matrix(get("Utilde.eigen.pen.mat",penden.env))
+  #Utilde <- Matrix(get("Utilde.eigen.pen.mat",penden.env))
+  Utilde <- get("Utilde.eigen.pen.mat",penden.env)
   t.Utilde <- t(Utilde)
-  diag.help2 <- Matrix(diag(help2$values[index]),sparse=FALSE,doDiag=TRUE)
+  diag.help2 <- diag(help2$values[index])
   hh <-1
   while(calc) {
     if(hh==31) {
@@ -21,7 +22,8 @@ new.lambda <- function(penden.env) {
       break
     }
     Derv2(penden.env,temp=TRUE,lambda=lambda[hh])
-    df.val <- sum(diag(x=solve(a=t.Utilde%*%Matrix(-get("Derv2.cal.temp",penden.env))%*%Utilde+lambda[hh]*diag.help2,tol=1e-50)%*%(t.Utilde%*%Matrix(-get("Derv2.cal.temp",penden.env))%*%Utilde)))
+    #browser()
+    df.val <- sum(diag(x=solve(a=t.Utilde%*%(-get("Derv2.cal.temp",penden.env))%*%Utilde+lambda[hh]*diag.help2,tol=1e-50)%*%(t.Utilde%*%(-get("Derv2.cal.temp",penden.env))%*%Utilde)))
     if(df.val < epsdf) {
       print("df kleiner 0")
       assign("df.val",df.val,penden.env)
